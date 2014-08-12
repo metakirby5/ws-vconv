@@ -1,31 +1,32 @@
-(function($, io) {
+(function($, io, ss) {
+
+  var video;
+  var ssvideo;
 
   function prepareSocketIo() {
-    var socket = io('/video'); 
-    socket.on('connect', function(data) {console.log('wow so connect');});
-    socket.on('msg', function(data) {
-      console.log(data);
-      socket.emit('msg', 'reply from client');
-    });
-    setTimeout(function() {
-      socket.emit('msg', 'message from client');
-    }, 1000);
+    video = io('/video'); 
+    ssvideo = ss(video);
+    console.log(video);
+
+    video
+      .on('connect', function(data) {
+        console.log('client connected');
+        video.emit('msg', 'client response');
+      })
+
+      .on('msg', function(msg) {
+        console.log(msg);
+      });
   }
 
   function prepareVideoUpload() {
     $('#video').change(function() {
-      // file = this.files[0];
-      // fReader = new FileReader();
+      console.log('selected');
+      var file = this.files[0];
+      var stream = ss.createStream();
 
-      // var Content = "<span id='NameArea'>Uploading " + file.name + "</span>";
-      // Content += '<div id="ProgressContainer"><div id="ProgressBar"></div></div><span id="percent">0%</span>';
-      // Content += "<span id='Uploaded'> - <span id='MB'>0</span>/" + Math.round(file.size / 1048576) + "MB</span>";
-      // $('#prog').html(Content);
-
-      // FReader.onload = function(e){
-      //   socket.emit('upload', e.target.result });
-      // }
-      // socket.emit('start', file.size });
+      ssvideo.emit('upload', stream);
+      ss.createBlobReadStream(file).pipe(stream);
     });
   }
 
@@ -33,4 +34,4 @@
     prepareSocketIo();
     prepareVideoUpload();
   });
-})(window.jQuery, io);
+})(window.jQuery, io, ss);

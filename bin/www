@@ -10,12 +10,28 @@ var server = app.listen(app.get('port'), function() {
 
 // socket.io
 var io = require('socket.io').listen(server);
-var io_vid = io.of('/video');
+var ss = require('socket.io-stream');
+var fs = require('fs');
+var ffmpeg = require('fluent-ffmpeg');
+var video = io.of('/video');
 
-io_vid.on('connection', function(socket) {
-  console.log('much connect');
-  socket.emit('msg', 'hello from server');
-  socket.on('msg', function(data) {
-    console.log(data);
+video.on('connection', function(socket) {
+  console.log('server connected');
+  socket.emit('msg', 'server response');
+
+  socket
+    .on('msg', function(msg) {
+      console.log(msg);
+    });
+
+  ss(socket).on('upload', function(stream) {
+    ffmpeg(stream)
+      .videoCodec('libvpx')
+      .videoBitrate('500k')
+      .audioCodec('libvorbis')
+      .audioBitrate('128k')
+      .format('webm')
+      .pipe(fs.createWriteStream('test.webm'));
+    // stream.pipe(fs.createWriteStream('test.mkv'));
   });
 });

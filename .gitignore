@@ -1,3 +1,7 @@
+# Project stuff
+*.mkv
+*.webm
+
 # Logs
 logs
 *.log
