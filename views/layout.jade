@@ -2,6 +2,13 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/css/style.css')
+    if css
+      for sheet in css
+        link(rel='stylesheet', href='/css/'+sheet)
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+    if js
+      for script in js
+        script(src='/js/'+js)
   body
     block content
